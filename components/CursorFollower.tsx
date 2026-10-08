@@ -14,11 +14,13 @@ export function CursorFollower() {
     if (!fine) return;
     setOn(true);
     document.documentElement.classList.add("custom-cursor");
+    document.documentElement.dataset.cursorFx = "on";
     const move = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", move);
+    window.addEventListener("mousemove", move, { passive: true });
     return () => {
       window.removeEventListener("mousemove", move);
       document.documentElement.classList.remove("custom-cursor");
+      delete document.documentElement.dataset.cursorFx;
     };
   }, [reduce]);
 
@@ -26,6 +28,7 @@ export function CursorFollower() {
   return (
     <motion.div
       className="cursor-dot"
+      data-cursor-dot="true"
       animate={{ x: pos.x, y: pos.y }}
       transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.4 }}
       aria-hidden

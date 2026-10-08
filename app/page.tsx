@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Lightning, ShieldCheck, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { HeroLottie } from "@/components/HeroLottie";
 import { Reveal } from "@/components/Reveal";
 import { StatsStrip } from "@/components/StatsStrip";
 import { SubscribeForm } from "@/components/SubscribeForm";
@@ -13,6 +14,9 @@ export default function HomePage() {
       <section className="hero">
         <div className="container hero-grid">
           <div>
+            <div className="hero-lottie-wrap">
+              <HeroLottie />
+            </div>
             <p className="eyebrow">Weekday digest · open source</p>
             <h1>See what people are actually shipping with Grok Bot</h1>
             <p className="lead">{SITE_DESCRIPTION}</p>
@@ -41,7 +45,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section section-compact">
         <div className="container">
           <StatsStrip
             stats={[
@@ -81,7 +85,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section" id="subscribe">
+      <section className="section section-compact" id="subscribe">
         <div className="container" style={{ display: "grid", gap: "1rem", maxWidth: 560 }}>
           <h2>Subscribe</h2>
           <p className="muted" style={{ marginTop: 0 }}>

@@ -282,3 +282,28 @@ p { text-wrap: pretty; }
   overflow: hidden; clip: rect(0,0,0,0);
   white-space: nowrap; border: 0;
 }
+
+.section-compact {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.hero-lottie-wrap {
+  margin: 0 0 0.75rem;
+  width: 140px;
+  height: 140px;
+}
+
+.hero-lottie {
+  width: 140px;
+  height: 140px;
+  filter: drop-shadow(0 0 24px rgb(125 211 252 / 0.35));
+}
+
+/* Ensure reveal content is visible if motion never hydrates */
+@media (scripting: none) {
+  .card, .subscribe {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

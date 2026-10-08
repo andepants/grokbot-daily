@@ -19,6 +19,7 @@ export function MagneticButton({
   const reduce = useReducedMotion();
   return (
     <motion.button
+      data-magnetic="true"
       type={type}
       className={className}
       disabled={disabled}
