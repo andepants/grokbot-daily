@@ -74,7 +74,8 @@ export function SubscribeForm() {
         />
         <span>
           Send me the weekday Grok Bot Daily digest. I can unsubscribe anytime. No spam, no selling
-          the list.
+          the list. We store your email with Resend to send the digest.{" "}
+          <a href="/privacy">Privacy</a>.
         </span>
       </label>
       <MagneticButton className="btn btn-primary" type="submit" disabled={status === "loading"}>

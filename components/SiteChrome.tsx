@@ -13,6 +13,7 @@ export function SiteHeader() {
           <Link href="/#why">Why</Link>
           <Link href="/archive">Archive</Link>
           <Link href="/#subscribe">Subscribe</Link>
+          <Link href="/privacy">Privacy</Link>
           <a href="https://github.com/andepants/grokbot-daily" rel="noreferrer" target="_blank">
             GitHub
           </a>
@@ -26,9 +27,14 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="container footer-row">
-        <p>Open source · MIT · Built for people running Grok Bot fleets.</p>
+        <p>
+          Open source · MIT · Published by The Heim Life LLC · Built for people running Grok Bot
+          fleets.
+        </p>
         <p>
           <a href="/feed.xml">RSS</a>
+          {" · "}
+          <Link href="/privacy">Privacy</Link>
           {" · "}
           <a href="https://github.com/andepants/grokbot-daily">Repo</a>
         </p>

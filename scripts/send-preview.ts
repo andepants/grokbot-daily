@@ -5,6 +5,10 @@ import { IssueEmail } from "../emails/IssueEmail";
 import { marked } from "./_markdown";
 
 async function main() {
+  if (process.env.CI) {
+    console.error("Refusing to send preview in CI");
+    process.exit(1);
+  }
   const slug = process.argv[2];
   const email = process.argv[3];
   if (!slug || !email) {
@@ -13,6 +17,8 @@ async function main() {
   }
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY required");
+  const mailingAddress =
+    (process.env.MAILING_ADDRESS || "").trim() || "[MAILING_ADDRESS unset — preview only]";
   const issue = getIssue(slug);
   if (!issue) throw new Error(`Issue not found: ${slug}`);
 
@@ -28,6 +34,7 @@ async function main() {
       htmlBody,
       issueUrl,
       unsubscribeUrl: unsub,
+      mailingAddress,
     }),
   );
 
@@ -40,6 +47,7 @@ async function main() {
     html,
     headers: {
       "List-Unsubscribe": `<${unsub}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
   });
   if (error) {

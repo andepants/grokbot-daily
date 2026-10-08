@@ -6,12 +6,14 @@ export function IssueEmail({
   htmlBody,
   issueUrl,
   unsubscribeUrl,
+  mailingAddress,
 }: {
   title: string;
   description: string;
   htmlBody: string;
   issueUrl: string;
   unsubscribeUrl: string;
+  mailingAddress: string;
 }) {
   return (
     <Html>
@@ -31,6 +33,11 @@ export function IssueEmail({
           <Text style={{ color: "#9aa3b5", fontSize: 12, marginTop: 32, borderTop: "1px solid #222", paddingTop: 16 }}>
             You are receiving this because you confirmed a subscription to Grok Bot Daily.{" "}
             <Link href={unsubscribeUrl}>Unsubscribe</Link>
+          </Text>
+          <Text style={{ color: "#6b7280", fontSize: 11, lineHeight: 1.5 }}>
+            The Heim Life LLC
+            <br />
+            {mailingAddress}
           </Text>
         </Container>
       </Body>

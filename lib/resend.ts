@@ -15,3 +15,14 @@ export function audienceId() {
   if (!id) throw new Error("RESEND_AUDIENCE_ID is not set");
   return id;
 }
+
+/** Resend Topic for Grok Bot Daily — unsubscribe is topic-scoped, not team-global. */
+export function topicId() {
+  const id = process.env.RESEND_TOPIC_ID;
+  if (!id) throw new Error("RESEND_TOPIC_ID is not set");
+  return id;
+}
+
+export function mailingAddress() {
+  return (process.env.MAILING_ADDRESS || "").trim();
+}

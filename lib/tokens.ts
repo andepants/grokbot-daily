@@ -1,12 +1,20 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 function secret() {
-  const s = process.env.CONFIRM_SECRET || process.env.RESEND_API_KEY;
+  const s = process.env.CONFIRM_SECRET;
   if (!s) throw new Error("CONFIRM_SECRET is not set");
   return s;
 }
 
-export function signEmailAction(email: string, action: "confirm" | "unsubscribe", ttlSec = 60 * 60 * 48) {
+/** Confirm tokens: 48h. Unsubscribe tokens: 10 years (List-Unsubscribe longevity). */
+export const CONFIRM_TTL_SEC = 60 * 60 * 48;
+export const UNSUBSCRIBE_TTL_SEC = 60 * 60 * 24 * 365 * 10;
+
+export function signEmailAction(
+  email: string,
+  action: "confirm" | "unsubscribe",
+  ttlSec = action === "unsubscribe" ? UNSUBSCRIBE_TTL_SEC : CONFIRM_TTL_SEC,
+) {
   const exp = Math.floor(Date.now() / 1000) + ttlSec;
   const payload = `${action}:${email.toLowerCase()}:${exp}`;
   const sig = createHmac("sha256", secret()).update(payload).digest("hex");

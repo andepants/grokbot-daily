@@ -74,7 +74,7 @@ export default function HomePage() {
             <Reveal className="card glass">
               <ShieldCheck size={28} weight="duotone" color="var(--accent-2)" />
               <h3>Consent-first email</h3>
-              <p>Double opt-in, one-click unsubscribe, List-Unsubscribe headers. Broadcasts never auto-send.</p>
+              <p>Double opt-in with a confirm button (no GET side effects), topic-scoped one-click unsubscribe, and List-Unsubscribe headers. Broadcasts are draft-only until you send them.</p>
             </Reveal>
             <Reveal className="card glass">
               <Sparkle size={28} weight="duotone" color="var(--success)" />

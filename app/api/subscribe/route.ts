@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { rateLimit } from "@/lib/rate-limit";
+import { ConfirmEmail } from "@/emails/ConfirmEmail";
+import { allowConfirmSend, normalizeEmail } from "@/lib/rate-limit";
+import { getResend, resendFrom } from "@/lib/resend";
+import { siteUrl } from "@/lib/site";
+import { signEmailAction } from "@/lib/tokens";
+import { render } from "@react-email/render";
 
 const bodySchema = z.object({
   email: z.string().email().max(320),
@@ -8,18 +13,8 @@ const bodySchema = z.object({
   website: z.string().max(200).optional(),
 });
 
-/**
- * HOTFIX (ec92c46 B1): confirmation email sending is temporarily disabled
- * while a durable limiter ships. Always returns {ok:true} for valid requests
- * so the form looks fine and no mail leaves hello@shotpup.com.
- */
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  const limited = rateLimit(`sub:${ip}`, 5, 60_000);
-  if (!limited.ok) {
-    // Same shape as success — no oracle / no 429 detail for attackers during hotfix
-    return NextResponse.json({ ok: true });
-  }
 
   let json: unknown;
   try {
@@ -33,10 +28,45 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Valid email and explicit consent are required." }, { status: 400 });
   }
 
+  // Honeypot
   if (parsed.data.website && parsed.data.website.trim().length > 0) {
     return NextResponse.json({ ok: true });
   }
 
-  // Intentionally no Resend contact create and no confirmation email (B1/B2 stopgap).
+  const email = normalizeEmail(parsed.data.email);
+
+  // Durable limiter — suppressed requests still return {ok:true} (no oracle).
+  const gate = await allowConfirmSend(ip, email);
+  if (!gate.ok) {
+    return NextResponse.json({ ok: true });
+  }
+
+  // B2: do NOT create a Resend contact here. Contact is created/updated only on confirm.
+  try {
+    const confirmToken = signEmailAction(email, "confirm");
+    const unsubToken = signEmailAction(email, "unsubscribe");
+    const confirmUrl = `${siteUrl()}/confirm?token=${confirmToken}`;
+    const unsubUrl = `${siteUrl()}/api/unsubscribe?token=${unsubToken}`;
+    const html = await render(ConfirmEmail({ confirmUrl }));
+
+    const resend = getResend();
+    const { error } = await resend.emails.send({
+      from: resendFrom(),
+      to: email,
+      subject: "Confirm your Grok Bot Daily subscription",
+      html,
+      headers: {
+        "List-Unsubscribe": `<${unsubUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
+    });
+    if (error) {
+      // Still return ok — no oracle; fail closed on abuse paths already consumed quota.
+      return NextResponse.json({ ok: true });
+    }
+  } catch {
+    return NextResponse.json({ ok: true });
+  }
+
   return NextResponse.json({ ok: true });
 }

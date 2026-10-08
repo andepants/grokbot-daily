@@ -3,6 +3,10 @@ import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
+function cdata(s: string) {
+  return s.replace(/]]>/g, "]]]]><![CDATA[>");
+}
+
 export function GET() {
   const base = siteUrl();
   const items = listIssues()
@@ -11,11 +15,11 @@ export function GET() {
       if (!issue) return "";
       const url = `${base}/issues/${issue.slug}`;
       return `<item>
-  <title><![CDATA[${issue.title}]]></title>
+  <title><![CDATA[${cdata(issue.title)}]]></title>
   <link>${url}</link>
   <guid>${url}</guid>
   <pubDate>${new Date(issue.date).toUTCString()}</pubDate>
-  <description><![CDATA[${issue.description}]]></description>
+  <description><![CDATA[${cdata(issue.description)}]]></description>
 </item>`;
     })
     .join("\n");

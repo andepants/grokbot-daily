@@ -5,6 +5,8 @@ import remarkGfm from "remark-gfm";
 import { getIssue, listIssues } from "@/lib/issues";
 import { siteUrl } from "@/lib/site";
 
+export const dynamicParams = false;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
