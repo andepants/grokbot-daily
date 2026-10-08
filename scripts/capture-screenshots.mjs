@@ -2,7 +2,7 @@ import { chromium } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
 const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:3000";
-const outDir = process.env.OUT_DIR ?? "/opt/cursor/artifacts/screenshots";
+const outDir = process.env.OUT_DIR ?? "./screenshots";
 const prefix = process.env.PREFIX ?? "before";
 
 await mkdir(outDir, { recursive: true });

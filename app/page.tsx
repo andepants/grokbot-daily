@@ -12,9 +12,6 @@ export default function HomePage() {
     <main>
       <section className="hero">
         <div className="container hero-stack">
-          <aside className="hero-aside">
-            <SubscribeBlock id="subscribe" formId="hero-subscribe" />
-          </aside>
           <div className="hero-main">
             <h1>See what people are actually shipping with Grok Bot</h1>
             <p className="lead">{SITE_DESCRIPTION}</p>
@@ -30,10 +27,13 @@ export default function HomePage() {
               Sourced from public X posts. Short quotes. Practical &ldquo;try this&rdquo; tips. No hype dumps.
             </p>
           </div>
+          <aside className="hero-aside" aria-label="Subscribe">
+            <SubscribeBlock id="subscribe" formId="hero-subscribe" />
+          </aside>
         </div>
       </section>
 
-      <section className="section section-compact">
+      <section className="section section-compact" aria-label="At a glance">
         <div className="container">
           <StatsStrip
             stats={[
@@ -110,6 +110,7 @@ export default function HomePage() {
           <SubscribeBlock
             id="subscribe-footer"
             formId="footer-subscribe"
+            titleId="subscribe-footer-heading"
             title="Subscribe"
             lead="Free on weekdays. Cancel anytime. Every issue includes one concrete way to improve your bot workflow."
           />
