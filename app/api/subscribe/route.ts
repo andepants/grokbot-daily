@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ConfirmEmail } from "@/emails/ConfirmEmail";
+import { clientIp } from "@/lib/client-ip";
 import { allowConfirmSend } from "@/lib/rate-limit";
 import { getResend, resendFrom } from "@/lib/resend";
 import { siteUrl } from "@/lib/site";
@@ -14,7 +15,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const ip = clientIp(req);
 
   let json: unknown;
   try {
