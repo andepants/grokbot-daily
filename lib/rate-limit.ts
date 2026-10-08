@@ -31,7 +31,7 @@ export function hashLimiterValue(value: string): string | null {
  * trim, lower, strip +tags, drop dots for gmail/googlemail.
  */
 export function normalizeEmail(email: string): string {
-  let e = email.trim().toLowerCase();
+  const e = email.trim().toLowerCase();
   const at = e.lastIndexOf("@");
   if (at <= 0) return e;
   let local = e.slice(0, at);
@@ -52,12 +52,17 @@ function redisFromEnv(): Redis | null {
 }
 
 async function withTimeout<T>(p: Promise<T>): Promise<T> {
-  return await Promise.race([
-    p,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error("store_timeout")), STORE_TIMEOUT_MS);
-    }),
-  ]);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      p,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("store_timeout")), STORE_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 function windowLimiter(redis: Redis, limit: number, window: `${number} ${"s" | "m" | "h" | "d"}`) {

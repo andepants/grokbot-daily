@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ConfirmEmail } from "@/emails/ConfirmEmail";
-import { allowConfirmSend, normalizeEmail } from "@/lib/rate-limit";
+import { allowConfirmSend } from "@/lib/rate-limit";
 import { getResend, resendFrom } from "@/lib/resend";
 import { siteUrl } from "@/lib/site";
 import { signEmailAction } from "@/lib/tokens";
@@ -33,7 +33,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const email = normalizeEmail(parsed.data.email);
+  // Deliver to the address as typed (trimmed, lowercased). allowConfirmSend applies
+  // +tag / gmail-dot normalisation internally for limiter keys only.
+  const email = parsed.data.email.trim().toLowerCase();
 
   // Durable limiter — suppressed requests still return {ok:true} (no oracle).
   const gate = await allowConfirmSend(ip, email);
