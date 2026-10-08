@@ -14,7 +14,8 @@
     "send:preview": "tsx scripts/send-preview.ts",
     "send:broadcast": "tsx scripts/send-broadcast.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "screenshots": "node scripts/capture-screenshots.mjs"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
+    "@playwright/test": "^1.64.0",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",

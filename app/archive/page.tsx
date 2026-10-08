@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SubscribeBlock } from "@/components/SubscribeBlock";
 import { listIssues } from "@/lib/issues";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default function ArchivePage() {
         <p className="muted">Every issue, newest first.</p>
         <div className="issue-list" style={{ marginTop: "1.5rem" }}>
           {issues.map((issue) => (
-            <Link key={issue.slug} className="issue-row glass" href={`/issues/${issue.slug}`}>
+            <Link key={issue.slug} className="issue-row surface" href={`/issues/${issue.slug}`}>
               <div>
                 <strong>{issue.title}</strong>
                 <div className="issue-meta">{issue.description}</div>
@@ -26,6 +27,11 @@ export default function ArchivePage() {
           ))}
         </div>
       </div>
+      <section className="section section-compact" aria-label="Subscribe">
+        <div className="container" style={{ maxWidth: 560 }}>
+          <SubscribeBlock formId="archive-subscribe" title="Get the next issue" lead="Weekday digest · double opt-in · unsubscribe anytime." />
+        </div>
+      </section>
     </main>
   );
 }

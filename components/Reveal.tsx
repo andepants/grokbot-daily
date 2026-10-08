@@ -20,7 +20,7 @@ export function Reveal({
     <motion.div
       className={className}
       data-reveal="true"
-      initial={false}
+      initial={reduce ? false : { y: 14, opacity: 0.92 }}
       whileInView={
         reduce
           ? undefined

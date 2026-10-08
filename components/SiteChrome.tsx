@@ -12,7 +12,9 @@ export function SiteHeader() {
         <nav className="nav-links" aria-label="Primary">
           <Link href="/#why">Why</Link>
           <Link href="/archive">Archive</Link>
-          <Link href="/#subscribe">Subscribe</Link>
+          <Link href="/#subscribe" className="nav-cta">
+            Subscribe
+          </Link>
           <Link href="/privacy">Privacy</Link>
           <a href="https://github.com/andepants/grokbot-daily" rel="noreferrer" target="_blank">
             GitHub

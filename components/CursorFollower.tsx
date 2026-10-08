@@ -1,37 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
 
+/**
+ * Decorative cursor accent for fine pointers only (desktop mice).
+ * Disabled on touch/coarse pointers and when reduced motion is preferred.
+ */
 export function CursorFollower() {
-  const reduce = useReducedMotion();
-  const [pos, setPos] = useState({ x: -100, y: -100 });
-  const [on, setOn] = useState(false);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (reduce) return;
     const fine = window.matchMedia("(pointer: fine)").matches;
-    if (!fine) return;
-    setOn(true);
-    document.documentElement.classList.add("custom-cursor");
-    document.documentElement.dataset.cursorFx = "on";
-    const move = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", move, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", move);
-      document.documentElement.classList.remove("custom-cursor");
-      delete document.documentElement.dataset.cursorFx;
-    };
-  }, [reduce]);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduce) return;
 
-  if (!on) return null;
-  return (
-    <motion.div
-      className="cursor-dot"
-      data-cursor-dot="true"
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.4 }}
-      aria-hidden
-    />
-  );
+    setEnabled(true);
+    document.documentElement.classList.add("custom-cursor");
+    const dot = document.createElement("div");
+    dot.className = "cursor-dot";
+    dot.setAttribute("aria-hidden", "true");
+    document.body.appendChild(dot);
+
+    let x = 0;
+    let y = 0;
+    let raf = 0;
+    const onMove = (e: MouseEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          dot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+          raf = 0;
+        });
+      }
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+      dot.remove();
+      document.documentElement.classList.remove("custom-cursor");
+    };
+  }, []);
+
+  if (!enabled) return null;
+  return null;
 }
