@@ -1,90 +1,161 @@
 /**
- * Durable rate limiter via Supabase SECURITY DEFINER RPCs (free tier).
- * Fails closed if the store is unreachable or misconfigured.
+ * Durable rate limiter via Upstash Redis (Vercel KV Marketplace free tier).
+ * Keys are HMAC-SHA256(pepper, value) — never raw IP/email. Fail closed.
  */
+import { createHmac } from "node:crypto";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 export type RateResult = { ok: boolean; reason?: string };
 
-function supabaseConfig() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const secret = process.env.GBD_RATE_SECRET;
-  if (!url || !key || !secret) return null;
-  return { url: url.replace(/\/$/, ""), key, secret };
+const STORE_TIMEOUT_MS = 3000;
+const TTL_IP_SEC = 60 * 60;
+const TTL_EMAIL_SEC = 60 * 60 * 24;
+const TTL_LIFE_SEC = 60 * 60 * 24 * 30;
+const TTL_GLOBAL_SEC = 60 * 60 * 24;
+
+function pepper(): string | null {
+  const p = process.env.GBD_KEY_PEPPER;
+  return p && p.length > 0 ? p : null;
 }
 
-async function rpc<T>(fn: string, body: Record<string, unknown>): Promise<T | null> {
-  const cfg = supabaseConfig();
-  if (!cfg) return null;
-  try {
-    const res = await fetch(`${cfg.url}/rest/v1/rpc/${fn}`, {
-      method: "POST",
-      headers: {
-        apikey: cfg.key,
-        Authorization: `Bearer ${cfg.key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
+/** HMAC-SHA256 hex digest for limiter keys only (never store raw PII). */
+export function hashLimiterValue(value: string): string | null {
+  const p = pepper();
+  if (!p) return null;
+  return createHmac("sha256", p).update(value).digest("hex");
+}
+
+/**
+ * Normalise for limiter keys only (not for Resend delivery address):
+ * trim, lower, strip +tags, drop dots for gmail/googlemail.
+ */
+export function normalizeEmail(email: string): string {
+  let e = email.trim().toLowerCase();
+  const at = e.lastIndexOf("@");
+  if (at <= 0) return e;
+  let local = e.slice(0, at);
+  const domain = e.slice(at + 1);
+  const plus = local.indexOf("+");
+  if (plus >= 0) local = local.slice(0, plus);
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    local = local.replace(/\./g, "");
   }
+  return `${local}@${domain}`;
 }
 
-/** Sliding fixed window via durable store. Fail closed. */
+function redisFromEnv(): Redis | null {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
+
+async function withTimeout<T>(p: Promise<T>): Promise<T> {
+  return await Promise.race([
+    p,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error("store_timeout")), STORE_TIMEOUT_MS);
+    }),
+  ]);
+}
+
+function windowLimiter(redis: Redis, limit: number, window: `${number} ${"s" | "m" | "h" | "d"}`) {
+  return new Ratelimit({
+    redis,
+    limiter: Ratelimit.fixedWindow(limit, window),
+    prefix: "gbd",
+    analytics: false,
+    ephemeralCache: false,
+  });
+}
+
+/** Fixed-window durable limit. Fail closed. */
 export async function durableRateLimit(
   bucket: string,
   limit: number,
   windowSeconds: number,
 ): Promise<RateResult> {
-  const cfg = supabaseConfig();
-  if (!cfg) return { ok: false, reason: "store_unconfigured" };
-  const allowed = await rpc<boolean>("gbd_rate_consume", {
-    p_secret: cfg.secret,
-    p_bucket: bucket,
-    p_limit: limit,
-    p_window_seconds: windowSeconds,
-  });
-  if (allowed === null) return { ok: false, reason: "store_error" };
-  return { ok: allowed, reason: allowed ? undefined : "limited" };
+  if (!pepper()) return { ok: false, reason: "store_unconfigured" };
+  const redis = redisFromEnv();
+  if (!redis) return { ok: false, reason: "store_unconfigured" };
+
+  let window: `${number} ${"s" | "m" | "h" | "d"}`;
+  if (windowSeconds % 86400 === 0) window = `${windowSeconds / 86400} d`;
+  else if (windowSeconds % 3600 === 0) window = `${windowSeconds / 3600} h`;
+  else if (windowSeconds % 60 === 0) window = `${windowSeconds / 60} m`;
+  else window = `${windowSeconds} s`;
+
+  try {
+    const rl = windowLimiter(redis, limit, window);
+    const { success } = await withTimeout(rl.limit(bucket));
+    return { ok: success, reason: success ? undefined : "limited" };
+  } catch {
+    return { ok: false, reason: "store_error" };
+  }
 }
 
-export async function durableEmailLifetime(emailNorm: string, lifetimeLimit: number): Promise<RateResult> {
-  const cfg = supabaseConfig();
-  if (!cfg) return { ok: false, reason: "store_unconfigured" };
-  const allowed = await rpc<boolean>("gbd_email_lifetime_consume", {
-    p_secret: cfg.secret,
-    p_email_norm: emailNorm,
-    p_lifetime_limit: lifetimeLimit,
-  });
-  if (allowed === null) return { ok: false, reason: "store_error" };
-  return { ok: allowed, reason: allowed ? undefined : "lifetime" };
+/** Lifetime unconfirmed-send counter with ~30d TTL. Fail closed. */
+export async function durableEmailLifetime(emailHash: string, lifetimeLimit: number): Promise<RateResult> {
+  if (!pepper()) return { ok: false, reason: "store_unconfigured" };
+  const redis = redisFromEnv();
+  if (!redis) return { ok: false, reason: "store_unconfigured" };
+  const key = `gbd:life:${emailHash}`;
+  try {
+    const n = await withTimeout(redis.incr(key));
+    if (typeof n !== "number" || Number.isNaN(n)) return { ok: false, reason: "store_error" };
+    if (n === 1) {
+      await withTimeout(redis.expire(key, TTL_LIFE_SEC));
+    }
+    if (n > lifetimeLimit) return { ok: false, reason: "lifetime" };
+    return { ok: true };
+  } catch {
+    return { ok: false, reason: "store_error" };
+  }
 }
 
-/** Normalize email for limiter keys. */
-export function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
+/** Clear lifetime counter after successful confirm (N4). */
+export async function clearEmailLifetime(email: string): Promise<void> {
+  const emailHash = hashLimiterValue(normalizeEmail(email));
+  const redis = redisFromEnv();
+  if (!emailHash || !redis) return;
+  try {
+    await withTimeout(redis.del(`gbd:life:${emailHash}`));
+  } catch {
+    /* best-effort */
+  }
 }
 
-/** Subscribe confirmation send gates. Same {ok:false} reasons stay internal. */
+/**
+ * Subscribe confirmation send gates.
+ * Global first (N4), then IP and email — so earlier gates are not burned when global denies.
+ */
 export async function allowConfirmSend(ip: string, email: string): Promise<RateResult> {
   const emailNorm = normalizeEmail(email);
-  const day = new Date().toISOString().slice(0, 10); // UTC day for global cap
+  const ipHash = hashLimiterValue(ip);
+  const emailHash = hashLimiterValue(emailNorm);
+  if (!ipHash || !emailHash) return { ok: false, reason: "store_unconfigured" };
 
-  const ipOk = await durableRateLimit(`gbd:ip:${ip}`, 5, 60 * 60);
+  const day = new Date().toISOString().slice(0, 10);
+
+  const globalOk = await durableRateLimit(`global:${day}`, 300, TTL_GLOBAL_SEC);
+  if (!globalOk.ok) return globalOk;
+
+  const ipOk = await durableRateLimit(`ip:${ipHash}`, 5, TTL_IP_SEC);
   if (!ipOk.ok) return ipOk;
 
-  const emailDayOk = await durableRateLimit(`gbd:email24:${emailNorm}`, 1, 60 * 60 * 24);
+  const emailDayOk = await durableRateLimit(`email24:${emailHash}`, 1, TTL_EMAIL_SEC);
   if (!emailDayOk.ok) return emailDayOk;
 
-  const lifetimeOk = await durableEmailLifetime(emailNorm, 3);
+  const lifetimeOk = await durableEmailLifetime(emailHash, 3);
   if (!lifetimeOk.ok) return lifetimeOk;
-
-  const globalOk = await durableRateLimit(`gbd:global:${day}`, 300, 60 * 60 * 24);
-  if (!globalOk.ok) return globalOk;
 
   return { ok: true };
 }
+
+export const __testing = {
+  TTL_IP_SEC,
+  TTL_EMAIL_SEC,
+  TTL_LIFE_SEC,
+  STORE_TIMEOUT_MS,
+};

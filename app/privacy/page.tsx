@@ -21,8 +21,10 @@ export default function PrivacyPage() {
         <ul>
           <li>Your email address, with Resend (our email provider), after you confirm.</li>
           <li>
-            Lightweight rate-limit counters (IP and email hashes) to stop abuse of the confirmation
-            flow. Those counters are not used for marketing.
+            Short-lived rate-limit counters keyed by HMAC-SHA256 hashes of your IP and email (never
+            the raw values) in Upstash Redis. IP counters expire in about 1 hour, per-email day
+            counters in about 24 hours, and unconfirmed-send lifetime counters in about 30 days.
+            Those counters are only used to stop abuse of the confirmation flow — not for marketing.
           </li>
         </ul>
         <h2>What we do not do</h2>

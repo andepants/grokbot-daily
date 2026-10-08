@@ -33,9 +33,9 @@ async function main() {
   }
 
   const key = process.env.RESEND_API_KEY;
-  const audienceId = process.env.RESEND_AUDIENCE_ID;
+  const segmentId = process.env.RESEND_AUDIENCE_ID; // Resend segment id
   const topicId = process.env.RESEND_TOPIC_ID;
-  if (!key || !audienceId) throw new Error("RESEND_API_KEY and RESEND_AUDIENCE_ID required");
+  if (!key || !segmentId) throw new Error("RESEND_API_KEY and RESEND_AUDIENCE_ID required");
   if (!topicId) throw new Error("RESEND_TOPIC_ID required");
 
   const issue = getIssue(slug);
@@ -58,7 +58,7 @@ async function main() {
 
   const resend = new Resend(key);
   const created = await resend.broadcasts.create({
-    audienceId,
+    segmentId,
     from: process.env.RESEND_FROM || "Grok Bot Daily <hello@shotpup.com>",
     subject: issue.title,
     html,

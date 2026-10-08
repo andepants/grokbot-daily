@@ -10,10 +10,16 @@ export function resendFrom() {
   return process.env.RESEND_FROM || "Grok Bot Daily <hello@shotpup.com>";
 }
 
-export function audienceId() {
+/** Broadcast segment (Resend audience id). */
+export function segmentId() {
   const id = process.env.RESEND_AUDIENCE_ID;
   if (!id) throw new Error("RESEND_AUDIENCE_ID is not set");
   return id;
+}
+
+/** @deprecated use segmentId */
+export function audienceId() {
+  return segmentId();
 }
 
 /** Resend Topic for Grok Bot Daily — unsubscribe is topic-scoped, not team-global. */

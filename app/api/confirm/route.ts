@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getResend, topicId } from "@/lib/resend";
+import { clearEmailLifetime } from "@/lib/rate-limit";
+import { getResend, segmentId, topicId } from "@/lib/resend";
 import { siteUrl } from "@/lib/site";
 import { verifyEmailAction } from "@/lib/tokens";
 
@@ -41,20 +42,25 @@ export async function POST(req: Request) {
 
   const resend = getResend();
   const tid = topicId();
+  const sid = segmentId();
 
-  // B2: create or update contact only on confirm. Topic-scoped (S16).
+  // B2 + N2: create contact with segment + topic; existing → segments.add + topic opt_in.
   const created = await resend.contacts.create({
     email,
+    segments: [{ id: sid }],
     topics: [{ id: tid, subscription: "opt_in" }],
   });
 
   if (created.error) {
-    // S11: handle create error — existing contact: update topic only (no global status overwrite).
     const topicUpdate = await resend.contacts.topics.update({
       email,
       topics: [{ id: tid, subscription: "opt_in" }],
     });
-    if (topicUpdate.error) {
+    const segAdd = await resend.contacts.segments.add({
+      email,
+      segmentId: sid,
+    });
+    if (topicUpdate.error && segAdd.error) {
       return NextResponse.redirect(`${siteUrl()}/?confirmed=0`, 303);
     }
   } else if (created.data?.id) {
@@ -63,6 +69,9 @@ export async function POST(req: Request) {
       topics: [{ id: tid, subscription: "opt_in" }],
     });
   }
+
+  // N4: reset lifetime unconfirmed counter on successful confirm
+  await clearEmailLifetime(email);
 
   return NextResponse.redirect(`${siteUrl()}/?confirmed=1`, 303);
 }

@@ -21,6 +21,8 @@
     "@phosphor-icons/react": "^2.1.10",
     "@react-email/components": "^0.5.6",
     "@react-email/render": "^1.2.3",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
     "geist": "^1.7.2",
     "gray-matter": "^4.0.3",
     "lottie-react": "^3.1.2",
