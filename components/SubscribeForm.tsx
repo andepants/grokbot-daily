@@ -2,7 +2,9 @@
 
 import { CheckCircle } from "@phosphor-icons/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { useId, useState } from "react";
+import { SUBSCRIBE_CONSENT_TEXT } from "@/lib/site";
 import { MagneticButton } from "./MagneticButton";
 
 function isValidEmail(value: string) {
@@ -115,6 +117,10 @@ export function SubscribeForm({ formId }: { formId?: string }) {
           {status === "loading" ? "Sending…" : "Subscribe"}
         </MagneticButton>
       </div>
+      <p className="subscribe-consent muted">
+        {SUBSCRIBE_CONSENT_TEXT}{" "}
+        <Link href="/privacy">Privacy</Link>.
+      </p>
       <input
         className="hp"
         tabIndex={-1}
@@ -140,10 +146,6 @@ export function SubscribeForm({ formId }: { formId?: string }) {
           </motion.p>
         ) : null}
       </AnimatePresence>
-      <p className="subscribe-consent muted">
-        Weekday digest only. Unsubscribe anytime.{" "}
-        <a href="/privacy">Privacy</a>.
-      </p>
     </form>
   );
 }

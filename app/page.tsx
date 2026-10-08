@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, Lightning, ShieldCheck, Sparkle } from "@phosphor-icons/react/dist/ssr";
-import { HeroLottie } from "@/components/HeroLottie";
 import { Reveal } from "@/components/Reveal";
 import { StatsStrip } from "@/components/StatsStrip";
 import { SubscribeBlock } from "@/components/SubscribeBlock";
@@ -17,20 +16,17 @@ export default function HomePage() {
             <SubscribeBlock id="subscribe" formId="hero-subscribe" />
           </aside>
           <div className="hero-main">
-            <div className="hero-lottie-wrap">
-              <HeroLottie />
-            </div>
             <h1>See what people are actually shipping with Grok Bot</h1>
             <p className="lead">{SITE_DESCRIPTION}</p>
             <div className="hero-actions">
-              <a href="#subscribe" className="btn btn-primary">
+              <a href="#subscribe" className="btn btn-primary hero-scroll-cta">
                 Get the digest <ArrowRight size={18} weight="bold" aria-hidden />
               </a>
               <Link href={latest ? `/issues/${latest.slug}` : "/archive"} className="btn btn-secondary">
                 Read latest issue
               </Link>
             </div>
-            <p className="muted" style={{ marginTop: "0.75rem", fontSize: "0.95rem", maxWidth: "36rem" }}>
+            <p className="muted hero-note">
               Sourced from public X posts. Short quotes. Practical &ldquo;try this&rdquo; tips. No hype dumps.
             </p>
           </div>
