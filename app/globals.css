@@ -142,7 +142,7 @@ a:hover {
   padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
 }
 .container.narrow {
-  max-width: 680px;
+  max-width: 640px;
 }
 
 /* Header / footer */
