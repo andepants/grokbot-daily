@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   async redirects() {
-    return [{ source: "/issues", destination: "/archive", permanent: true }];
+    return [{ source: "/archive", destination: "/issues", permanent: true }];
   },
   async headers() {
     return [

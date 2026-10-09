@@ -3,13 +3,14 @@
 Open-source daily email digest of the most interesting things people are doing with [Grok Bot](https://x.ai/bot), sourced from public posts on X.
 
 - Landing page + email signup (double opt-in via Resend)
-- `/archive` and `/issues/[slug]` rendered from `content/issues/*.md`
+- `/issues` and `/issues/[slug]` rendered from `content/issues/*.md`
+- `/workflows` (curated, source-linked library in `lib/library.ts`), `/guides` (`content/guides/*.md`), `/resources` (`lib/resources.ts`), `/about` (editorial standards)
 - RSS at `/feed.xml`
 - React Email templates + `pnpm send:preview` / `pnpm send:broadcast`
 
 ## Stack
 
-Next.js 15 (App Router), React 19, Geist, Resend. Plain CSS tokens, light theme only, one SVG bot mark with a CSS blink animation (static under `prefers-reduced-motion`).
+Next.js 15 (App Router), React 19, Geist, Resend. Plain CSS tokens, light theme only, one SVG "sunrise bot" mark (`components/GrokBot.tsx`) with a CSS sunrise/blink animation (static under `prefers-reduced-motion`).
 
 ## Local development
 
