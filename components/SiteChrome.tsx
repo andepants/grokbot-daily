@@ -7,12 +7,17 @@ export function SiteHeader() {
       <div className="container nav">
         <Link href="/" className="brand">
           <span className="brand-mark" aria-hidden />
-          {SITE_NAME}
+          <span className="brand-name">{SITE_NAME}</span>
         </Link>
-        <nav className="nav-links" aria-label="Primary">
+        <Link href="/#subscribe" className="nav-mobile-subscribe">
+          Subscribe
+        </Link>
+        <nav className="nav-links nav-links-desktop" aria-label="Primary">
           <Link href="/#why">Why</Link>
           <Link href="/archive">Archive</Link>
-          <Link href="/#subscribe">Subscribe</Link>
+          <Link href="/#subscribe" className="nav-cta">
+            Subscribe
+          </Link>
           <Link href="/privacy">Privacy</Link>
           <a href="https://github.com/andepants/grokbot-daily" rel="noreferrer" target="_blank">
             GitHub
@@ -31,13 +36,14 @@ export function SiteFooter() {
           Open source · MIT · Published by The Heim Life LLC · Built for people running Grok Bot
           fleets.
         </p>
-        <p>
-          <a href="/feed.xml">RSS</a>
-          {" · "}
+        <nav className="footer-links" aria-label="Site">
+          <Link href="/#why">Why</Link>
+          <Link href="/archive">Archive</Link>
+          <Link href="/#subscribe">Subscribe</Link>
           <Link href="/privacy">Privacy</Link>
-          {" · "}
-          <a href="https://github.com/andepants/grokbot-daily">Repo</a>
-        </p>
+          <a href="https://github.com/andepants/grokbot-daily">GitHub</a>
+          <a href="/feed.xml">RSS</a>
+        </nav>
       </div>
     </footer>
   );

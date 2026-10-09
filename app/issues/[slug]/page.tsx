@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { SubscribeBlock } from "@/components/SubscribeBlock";
 import { getIssue, listIssues } from "@/lib/issues";
 import { siteUrl } from "@/lib/site";
 
@@ -37,11 +38,16 @@ export default async function IssuePage({ params }: Props) {
   return (
     <main className="section">
       <article className="container prose">
-        <p className="eyebrow">{issue.date}</p>
+        <p className="issue-date">{issue.date}</p>
         <h1>{issue.title}</h1>
         <p className="lead muted">{issue.description}</p>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{issue.content}</ReactMarkdown>
       </article>
+      <section className="section section-compact" aria-label="Subscribe">
+        <div className="container" style={{ maxWidth: 560 }}>
+          <SubscribeBlock formId={`issue-${issue.slug}-subscribe`} title="Enjoyed this issue?" lead="Get the weekday digest in your inbox." />
+        </div>
+      </section>
     </main>
   );
 }

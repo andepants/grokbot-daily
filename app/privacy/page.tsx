@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_NAME, SUBSCRIBE_CONSENT_TEXT } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -16,6 +16,11 @@ export default function PrivacyPage() {
           {SITE_NAME} is published by <strong>The Heim Life LLC</strong>. We collect the email
           address you submit on the subscribe form so we can send a confirmation message and, after
           you confirm, the weekday digest.
+        </p>
+        <p>
+          When you tap Subscribe, you see this consent line on the form: &ldquo;{SUBSCRIBE_CONSENT_TEXT}&rdquo;{" "}
+          (with a link to this page). Submitting the form sends explicit consent for that digest only; we still
+          require email confirmation before any mail goes out.
         </p>
         <h2>What we store</h2>
         <ul>

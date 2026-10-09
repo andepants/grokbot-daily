@@ -12,7 +12,7 @@ export function StatsStrip({
   return (
     <div className="stats">
       {stats.map((s) => (
-        <div key={s.label} className="stat glass">
+        <div key={s.label} className="stat">
           <div className="stat-value" data-numberflow="true">
             {reduce || s.staticDisplay ? (
               s.staticDisplay ?? `${s.prefix ?? ""}${s.value}${s.suffix ?? ""}`

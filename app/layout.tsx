@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { CursorFollower } from "@/components/CursorFollower";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, siteUrl } from "@/lib/site";
 import "./globals.css";
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -35,7 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
-        <CursorFollower />
         <SiteHeader />
         {children}
         <SiteFooter />
