@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+/** Vercel preview deployments inject the toolbar from vercel.live; production never does. */
+const isPreview = process.env.VERCEL_ENV === "preview";
+const live = isPreview ? " https://vercel.live" : "";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -22,11 +27,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob:",
-              "font-src 'self' data:",
-              "connect-src 'self'",
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${live}`,
+              `style-src 'self' 'unsafe-inline'${live}`,
+              `img-src 'self' data: blob:${isPreview ? " https://vercel.live https://vercel.com" : ""}`,
+              `font-src 'self' data:${isPreview ? " https://vercel.live https://assets.vercel.com" : ""}`,
+              `connect-src 'self'${isPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
+              ...(isPreview ? ["frame-src https://vercel.live"] : []),
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
