@@ -1,31 +1,20 @@
 import { SubscribeForm } from "./SubscribeForm";
 
-type Props = {
-  id?: string;
-  title?: string;
-  titleId?: string;
-  lead?: string;
-  formId?: string;
-  className?: string;
-};
+type Props = { id?: string; title?: string; lead?: string; formId?: string };
 
+/** Compact end-of-page subscribe section (one per page). */
 export function SubscribeBlock({
   id,
-  title = "Get Grok Bot Daily",
-  titleId,
-  lead = "One email on weekdays when there’s something worth your time. Double opt-in.",
+  title = "Get it every morning",
+  lead = "One short email a day. Free. Unsubscribe in one click.",
   formId,
-  className,
 }: Props) {
+  const headingId = `${formId ?? id ?? "subscribe"}-title`;
   return (
-    <div className={`subscribe-block surface ${className ?? ""}`.trim()} id={id}>
-      {title ? (
-        <h2 id={titleId} className="subscribe-block-title">
-          {title}
-        </h2>
-      ) : null}
-      {lead ? <p className="subscribe-block-lead muted">{lead}</p> : null}
+    <section className="subscribe-block" id={id} aria-labelledby={headingId}>
+      <h2 id={headingId}>{title}</h2>
+      <p className="muted">{lead}</p>
       <SubscribeForm formId={formId ?? id} />
-    </div>
+    </section>
   );
 }

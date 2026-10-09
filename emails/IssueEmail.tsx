@@ -19,22 +19,20 @@ export function IssueEmail({
     <Html>
       <Head />
       <Preview>{description}</Preview>
-      <Body style={{ background: "#0b0d12", color: "#f4f1ea", fontFamily: "system-ui, sans-serif" }}>
+      <Body style={{ background: "#ffffff", color: "#0a0a0a", fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif", lineHeight: 1.6 }}>
         <Container style={{ padding: "32px 20px", maxWidth: 600 }}>
-          <Text style={{ color: "#7dd3fc", letterSpacing: 2, fontSize: 12, fontWeight: 700 }}>
-            GROK BOT DAILY
-          </Text>
-          <Heading style={{ fontSize: 26, marginTop: 8 }}>{title}</Heading>
-          <Text style={{ color: "#9aa3b5" }}>{description}</Text>
-          <Text style={{ color: "#9aa3b5" }}>
-            Read on the web: <Link href={issueUrl}>{issueUrl}</Link>
+          <Text style={{ color: "#5c5c5c", fontSize: 13, fontWeight: 600 }}>Grok Bot Daily</Text>
+          <Heading style={{ fontSize: 26, marginTop: 8, letterSpacing: "-0.02em" }}>{title}</Heading>
+          <Text style={{ color: "#3d3d3d" }}>{description}</Text>
+          <Text style={{ color: "#5c5c5c", fontSize: 14 }}>
+            Read on the web: <Link href={issueUrl} style={{ color: "#0a0a0a" }}>{issueUrl}</Link>
           </Text>
           <div dangerouslySetInnerHTML={{ __html: htmlBody }} />
-          <Text style={{ color: "#9aa3b5", fontSize: 12, marginTop: 32, borderTop: "1px solid #222", paddingTop: 16 }}>
+          <Text style={{ color: "#5c5c5c", fontSize: 12, marginTop: 32, borderTop: "1px solid #e5e5e5", paddingTop: 16 }}>
             You are receiving this because you confirmed a subscription to Grok Bot Daily.{" "}
-            <Link href={unsubscribeUrl}>Unsubscribe</Link>
+            <Link href={unsubscribeUrl} style={{ color: "#0a0a0a" }}>Unsubscribe</Link>
           </Text>
-          <Text style={{ color: "#6b7280", fontSize: 11, lineHeight: 1.5 }}>
+          <Text style={{ color: "#5c5c5c", fontSize: 11, lineHeight: 1.5 }}>
             The Heim Life LLC
             <br />
             {mailingAddress}
