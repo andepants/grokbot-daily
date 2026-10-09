@@ -10,7 +10,7 @@ Open-source daily email digest of the most interesting things people are doing w
 
 ## Stack
 
-Next.js 15 (App Router), React 19, Geist, Resend. Plain CSS tokens, light theme only, one SVG "sunrise bot" mark (`components/GrokBot.tsx`) with a CSS sunrise/blink animation (static under `prefers-reduced-motion`).
+Next.js 15 (App Router), React 19, Geist, Resend. Plain CSS tokens, light theme only, one SVG round-bot mark (`components/GrokBot.tsx`) with a CSS idle loop (look-around, eye darts, bob, blink, antenna pulse) (static under `prefers-reduced-motion`).
 
 ## Local development
 

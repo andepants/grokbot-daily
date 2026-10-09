@@ -237,9 +237,6 @@ a:hover {
     box-shadow: inset 0 -2px 0 var(--text);
   }
 }
-.brand:hover .bot-eye {
-  animation: bot-blink-once 0.5s var(--ease-out);
-}
 .footer-brand {
   display: flex;
   align-items: center;
@@ -998,7 +995,10 @@ a:hover {
   overflow-wrap: anywhere;
 }
 
-/* Grok Bot mark ("sunrise bot") + animation */
+/* Grok Bot mark (round bot) + animation.
+   Every keyframe starts and ends at the resting pose and nothing animates
+   opacity to 0, so the mark is fully visible at first paint, before or
+   without animation, and in mid-loop screenshots. */
 .bot {
   display: block;
   flex: none;
@@ -1007,113 +1007,189 @@ a:hover {
 }
 .bot-eye,
 .bot-eyes,
+.bot-gaze,
 .bot-antenna,
-.bot-rise,
-.bot-line {
+.bot-body {
   transform-box: fill-box;
   transform-origin: center;
 }
-.bot-line {
-  transform-origin: left center;
-}
-.bot--lost .bot-rise {
-  transform: translateY(5px);
+.bot-body {
+  transform-origin: 50% 85%;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .hero-bot .bot-rise {
-    animation: bot-sunrise 1.1s var(--ease-out) 0.1s both;
-  }
-  .hero-bot .bot-line-1 {
-    animation: bot-write 0.7s var(--ease-out) 0.05s both;
-  }
-  .hero-bot .bot-line-2 {
-    animation: bot-write 0.7s var(--ease-out) 0.25s both;
-  }
-  .bot--live .bot-eye {
-    animation: bot-blink 6s var(--ease-out) 1.4s infinite;
+  /* Idle "working" loop: look around, dart side to side, bob/tilt, blink, pulse. */
+  .bot--live .bot-body {
+    animation: bot-bob 3.6s ease-in-out infinite;
   }
   .bot--live .bot-eyes {
-    animation: bot-glance 7s var(--ease-out) 2s infinite;
+    animation: bot-look 9s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+  }
+  .bot--live .bot-gaze {
+    animation: bot-dart 9s linear infinite;
+  }
+  .bot--live .bot-eye {
+    animation: bot-blink 9s ease-in-out infinite;
   }
   .bot--live .bot-antenna {
-    animation: bot-ping 3s ease-in-out 1.2s infinite;
+    animation: bot-ping 2.4s ease-in-out infinite;
   }
-  .bot-hop .bot-rise {
-    animation: bot-hop 0.6s var(--ease-out) both;
+  /* Header: a short glance + blink on hover. */
+  .brand:hover .bot-gaze,
+  .brand:focus-visible .bot-gaze {
+    animation: bot-dart-once 0.8s ease-out;
+  }
+  .brand:hover .bot-eye,
+  .brand:focus-visible .bot-eye {
+    animation: bot-blink-once 0.45s ease-in-out 0.55s;
+  }
+  .brand:hover .bot-body,
+  .brand:focus-visible .bot-body {
+    animation: bot-tilt-once 0.9s ease-in-out;
+  }
+  .brand:hover .bot-antenna,
+  .brand:focus-visible .bot-antenna {
+    animation: bot-ping 0.9s ease-in-out;
+  }
+  .bot-hop .bot-body {
+    animation: bot-hop 0.6s var(--ease-out);
   }
 }
-@keyframes bot-sunrise {
-  from {
-    transform: translateY(30px);
+@keyframes bot-bob {
+  0%,
+  100% {
+    transform: none;
   }
-  to {
+  25% {
+    transform: translateY(-1px) rotate(-2.5deg);
+  }
+  50% {
+    transform: translateY(0.4px);
+  }
+  75% {
+    transform: translateY(-1px) rotate(2.5deg);
+  }
+}
+@keyframes bot-look {
+  0%,
+  8%,
+  36%,
+  44%,
+  100% {
+    transform: none;
+  }
+  13%,
+  28% {
+    transform: translate(3px, -2px);
+  }
+  50%,
+  60% {
+    transform: translate(-3.5px, 0.5px);
+  }
+  65%,
+  72% {
+    transform: translate(2px, 2px);
+  }
+  77%,
+  94% {
     transform: none;
   }
 }
-@keyframes bot-write {
-  from {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  to {
+@keyframes bot-dart {
+  0%,
+  80%,
+  92%,
+  100% {
     transform: none;
-    opacity: 1;
+  }
+  81%,
+  83% {
+    transform: translateX(2.5px);
+  }
+  84%,
+  86% {
+    transform: translateX(-2.5px);
+  }
+  87%,
+  89% {
+    transform: translateX(2.5px);
+  }
+  90%,
+  91% {
+    transform: translateX(-1px);
   }
 }
 @keyframes bot-blink {
   0%,
-  44%,
-  50%,
+  31%,
+  35%,
+  70%,
+  73%,
+  76%,
+  79%,
   100% {
-    transform: scaleY(1);
+    transform: none;
   }
-  47% {
-    transform: scaleY(0.12);
+  33% {
+    transform: scaleY(0.1);
+  }
+  71.5%,
+  77.5% {
+    transform: scaleY(0.1);
   }
 }
 @keyframes bot-blink-once {
   0%,
   100% {
-    transform: scaleY(1);
+    transform: none;
   }
   50% {
-    transform: scaleY(0.12);
+    transform: scaleY(0.1);
   }
 }
-@keyframes bot-glance {
+@keyframes bot-dart-once {
   0%,
-  12%,
-  88%,
   100% {
-    transform: translateX(0);
+    transform: none;
   }
-  18%,
-  30% {
-    transform: translateX(2px);
+  20%,
+  35% {
+    transform: translateX(2.5px);
   }
-  62%,
-  76% {
-    transform: translateX(-2px);
+  55%,
+  70% {
+    transform: translateX(-2.5px);
+  }
+}
+@keyframes bot-tilt-once {
+  0%,
+  100% {
+    transform: none;
+  }
+  35% {
+    transform: rotate(-5deg);
+  }
+  70% {
+    transform: rotate(3deg);
   }
 }
 @keyframes bot-ping {
   0%,
   100% {
-    transform: scale(1);
+    transform: none;
+    opacity: 1;
   }
   50% {
     transform: scale(1.3);
+    opacity: 0.6;
   }
 }
 @keyframes bot-hop {
-  0% {
-    transform: translateY(0);
+  0%,
+  100% {
+    transform: none;
   }
   40% {
-    transform: translateY(-4px);
-  }
-  100% {
-    transform: translateY(0);
+    transform: translateY(-6px);
   }
 }
 
