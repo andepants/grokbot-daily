@@ -700,7 +700,10 @@ a:hover {
 }
 .split-main {
   min-width: 0;
-  max-width: 720px;
+  max-width: 680px;
+}
+.wf > p {
+  max-width: 68ch;
 }
 .wf-group + .wf-group {
   margin-top: 2.5rem;
