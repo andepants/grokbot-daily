@@ -1,0 +1,50 @@
+{
+  "name": "grokbot-daily",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source daily newsletter + landing page for interesting Grok Bot workflows from X",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "send:preview": "tsx scripts/send-preview.ts",
+    "send:broadcast": "tsx scripts/send-broadcast.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@number-flow/react": "^0.6.2",
+    "@phosphor-icons/react": "^2.1.10",
+    "@react-email/components": "^0.5.6",
+    "@react-email/render": "^1.2.3",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
+    "geist": "^1.7.2",
+    "gray-matter": "^4.0.3",
+    "lottie-react": "^3.1.2",
+    "motion": "^12.23.12",
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "resend": "^6.32.1",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^5.0.3"
+  }
+}

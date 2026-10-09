@@ -1,0 +1,15 @@
+node_modules
+.next
+.vercel
+.env
+.env.local
+.env*.local
+dist
+coverage
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+screenshots/
+landing.png
+landing-v2.png
+issue-*.png
