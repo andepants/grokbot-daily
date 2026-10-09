@@ -84,7 +84,7 @@ a {
   color: inherit;
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
-  text-decoration-color: var(--line-strong);
+  text-decoration-color: #8f8f8f;
   text-underline-offset: 3px;
   transition: text-decoration-color 0.15s var(--ease-out);
 }
@@ -603,7 +603,6 @@ a:hover {
 }
 .prose a {
   color: var(--text);
-  text-decoration-color: #8f8f8f;
   overflow-wrap: anywhere;
 }
 
