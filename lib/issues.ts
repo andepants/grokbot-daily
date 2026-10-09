@@ -52,3 +52,26 @@ export function getIssue(slug: string): Issue | null {
     content,
   };
 }
+
+/** Strip a hardcoded "Issue #N — " prefix; the number is derived from archive order. */
+export function displayTitle(title: string) {
+  return title.replace(/^Issue\s*#\d+\s*[—–:-]\s*/i, "").trim();
+}
+
+/** 1-based issue number, oldest = 1. */
+export function issueNumber(slug: string, issues: IssueMeta[] = listIssues()) {
+  const idx = issues.findIndex((i) => i.slug === slug);
+  return idx === -1 ? null : issues.length - idx;
+}
+
+/** "Thu, Oct 8, 2026" (dates are calendar dates, so format in UTC). */
+export function formatIssueDate(date: string, style: "long" | "short" = "long") {
+  const d = new Date(`${date.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return date;
+  return d.toLocaleDateString("en-US", {
+    timeZone: "UTC",
+    ...(style === "long"
+      ? { weekday: "short", month: "short", day: "numeric", year: "numeric" }
+      : { month: "short", day: "numeric" }),
+  });
+}

@@ -1,25 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_NAME, SUBSCRIBE_CONSENT_TEXT } from "@/lib/site";
+import { alternatesFor } from "@/lib/meta";
+import { CONTACT_EMAIL, SITE_NAME, SUBSCRIBE_CONSENT_TEXT } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy",
   description: `How ${SITE_NAME} handles your email address.`,
+  alternates: alternatesFor("/privacy"),
 };
 
 export default function PrivacyPage() {
   return (
-    <main className="section">
-      <article className="container prose" style={{ maxWidth: 720 }}>
+    <main id="main" className="container narrow page">
+      <article className="prose">
         <h1>Privacy</h1>
         <p>
           {SITE_NAME} is published by <strong>The Heim Life LLC</strong>. We collect the email
           address you submit on the subscribe form so we can send a confirmation message and, after
-          you confirm, the weekday digest.
+          you confirm, one email each morning.
         </p>
         <p>
           When you tap Subscribe, you see this consent line on the form: &ldquo;{SUBSCRIBE_CONSENT_TEXT}&rdquo;{" "}
-          (with a link to this page). Submitting the form sends explicit consent for that digest only; we still
+          (with a link to this page). Submitting the form sends explicit consent for this newsletter only; we still
           require email confirmation before any mail goes out.
         </p>
         <h2>What we store</h2>
@@ -40,9 +42,9 @@ export default function PrivacyPage() {
         </ul>
         <h2>Your choices</h2>
         <p>
-          Every digest includes a one-click unsubscribe link and List-Unsubscribe headers. You can
+          Every issue includes a one-click unsubscribe link and List-Unsubscribe headers. You can
           also email{" "}
-          <a href="mailto:hello@shotpup.com">hello@shotpup.com</a> to ask us to delete your contact
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> to ask us to delete your contact
           record for this newsletter.
         </p>
         <p>

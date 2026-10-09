@@ -8,9 +8,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}/issues/${i.slug}`,
     lastModified: i.date,
   }));
+  const latest = issues[0]?.lastModified;
   return [
-    { url: base, lastModified: new Date() },
-    { url: `${base}/archive`, lastModified: new Date() },
+    { url: base, lastModified: latest },
+    { url: `${base}/archive`, lastModified: latest },
     ...issues,
+    { url: `${base}/privacy` },
   ];
 }

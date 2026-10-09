@@ -1,120 +1,51 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Lightning, ShieldCheck, Sparkle } from "@phosphor-icons/react/dist/ssr";
-import { Reveal } from "@/components/Reveal";
-import { StatsStrip } from "@/components/StatsStrip";
-import { SubscribeBlock } from "@/components/SubscribeBlock";
+import { GrokBot } from "@/components/GrokBot";
+import { IssueList } from "@/components/IssueList";
+import { StatusNotice } from "@/components/StatusNotice";
+import { SubscribeForm } from "@/components/SubscribeForm";
 import { listIssues } from "@/lib/issues";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import { alternatesFor } from "@/lib/meta";
+
+export const metadata: Metadata = { alternates: alternatesFor("/") };
 
 export default function HomePage() {
-  const latest = listIssues()[0];
+  const issues = listIssues();
   return (
-    <main>
-      <section className="hero">
-        <div className="container hero-stack">
-          <div className="hero-main">
-            <h1>See what people are actually shipping with Grok Bot</h1>
-            <p className="lead">{SITE_DESCRIPTION}</p>
-            <div className="hero-actions">
-              <a href="#subscribe" className="btn btn-primary hero-scroll-cta">
-                Get the digest <ArrowRight size={18} weight="bold" aria-hidden />
-              </a>
-              <Link href={latest ? `/issues/${latest.slug}` : "/archive"} className="btn btn-secondary">
-                Read latest issue
-              </Link>
-            </div>
-            <p className="muted hero-note">
-              Sourced from public X posts. Short quotes. Practical &ldquo;try this&rdquo; tips. No hype dumps.
-            </p>
-          </div>
-          <aside className="hero-aside" aria-label="Subscribe">
-            <SubscribeBlock id="subscribe" formId="hero-subscribe" />
-          </aside>
-        </div>
+    <main id="main" className="container narrow">
+      <StatusNotice />
+      <section className="hero" id="subscribe" aria-labelledby="hero-title">
+        <GrokBot size={88} live className="hero-bot" />
+        <h1 id="hero-title">The best of Grok&nbsp;Bot, every&nbsp;morning.</h1>
+        <p className="lead">
+          One short email a day with the most useful Grok Bot workflows, routines, and skills people shared on X.
+          Free and open source.
+        </p>
+        <SubscribeForm formId="hero" />
       </section>
 
-      <section className="section section-compact" aria-label="At a glance">
-        <div className="container">
-          <StatsStrip
-            stats={[
-              { label: "Minutes to skim", value: 5, suffix: " min", staticDisplay: "~5 min" },
-              { label: "Issues so far", value: listIssues().length },
-              { label: "Ads in the email", value: 0 },
-              { label: "Source", value: 100, suffix: "% X", staticDisplay: "100% X" },
-            ]}
-          />
+      <section className="block" aria-labelledby="latest-title">
+        <div className="block-head">
+          <h2 id="latest-title">Latest issues</h2>
+          {issues.length > 3 ? <Link href="/archive">All issues</Link> : null}
         </div>
+        <IssueList issues={issues.slice(0, 3)} total={issues.length} />
       </section>
 
-      <section className="section" id="why">
-        <div className="container">
-          <h2 className="section-title">Why {SITE_NAME}</h2>
-          <p className="section-sub">
-            Grok Bot fleets move fast. This digest keeps the signal: routines that stick, skills worth copying,
-            and honest warnings when viral lists look sketchy.
-          </p>
-          <div className="card-grid">
-            <Reveal className="card surface">
-              <Lightning size={28} weight="duotone" color="var(--accent)" />
-              <h3>Workflow-first</h3>
-              <p>We highlight runnable setups — routines, harnesses, teach-by-demo skills — not vague vibes.</p>
-            </Reveal>
-            <Reveal className="card surface">
-              <ShieldCheck size={28} weight="duotone" color="var(--accent-2)" />
-              <h3>Consent-first email</h3>
-              <p>
-                Double opt-in with a confirm button (no GET side effects), topic-scoped one-click unsubscribe, and
-                List-Unsubscribe headers. Broadcasts are draft-only until you send them.
-              </p>
-            </Reveal>
-            <Reveal className="card surface">
-              <Sparkle size={28} weight="duotone" color="var(--success)" />
-              <h3>Open archive</h3>
-              <p>Every issue lives as Markdown in the repo and on the site. Fork it. Improve it. Self-host it.</p>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="archive-header">
-            <div>
-              <h2 className="section-title">Latest issue</h2>
-              <p className="section-sub" style={{ marginBottom: 0 }}>
-                Also available as RSS and in the public GitHub repo.
-              </p>
-            </div>
-            <Link href="/archive" className="archive-link">
-              Full archive →
-            </Link>
-          </div>
-          <div className="issue-list" style={{ marginTop: "1.25rem" }}>
-            {latest ? (
-              <Link className="issue-row surface" href={`/issues/${latest.slug}`}>
-                <div>
-                  <strong>{latest.title}</strong>
-                  <div className="issue-meta">{latest.description}</div>
-                </div>
-                <div className="issue-meta">{latest.date}</div>
-              </Link>
-            ) : (
-              <p className="muted">No issues yet.</p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-compact" aria-labelledby="subscribe-footer-heading">
-        <div className="container" style={{ maxWidth: 560 }}>
-          <SubscribeBlock
-            id="subscribe-footer"
-            formId="footer-subscribe"
-            titleId="subscribe-footer-heading"
-            title="Subscribe"
-            lead="Free on weekdays. Cancel anytime. Every issue includes one concrete way to improve your bot workflow."
-          />
-        </div>
+      <section className="block" aria-labelledby="what-title">
+        <h2 id="what-title">What’s inside</h2>
+        <ul className="points">
+          <li>
+            <strong>Setups you can copy.</strong> Routines, harnesses, and skills people actually run, linked to the
+            original post.
+          </li>
+          <li>
+            <strong>One thing to try.</strong> Every issue ends with a small change you can make to your own bot today.
+          </li>
+          <li>
+            <strong>Honest notes.</strong> When a viral list looks off, we say so.
+          </li>
+        </ul>
       </section>
     </main>
   );

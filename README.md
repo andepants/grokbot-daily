@@ -1,6 +1,6 @@
 # Grok Bot Daily
 
-Open-source weekday digest of the most interesting things people are doing with [Grok Bot](https://x.ai/bot), sourced from public posts on X.
+Open-source daily email digest of the most interesting things people are doing with [Grok Bot](https://x.ai/bot), sourced from public posts on X.
 
 - Landing page + email signup (double opt-in via Resend)
 - `/archive` and `/issues/[slug]` rendered from `content/issues/*.md`
@@ -9,7 +9,7 @@ Open-source weekday digest of the most interesting things people are doing with 
 
 ## Stack
 
-Next.js 15 (App Router), React 19, Geist, Motion, NumberFlow, Phosphor, Resend — same UI library set as the ShotPup marketing site (custom CSS tokens, magnetic button, cursor follower, glass cards).
+Next.js 15 (App Router), React 19, Geist, Resend. Plain CSS tokens, light theme only, one SVG bot mark with a CSS blink animation (static under `prefers-reduced-motion`).
 
 ## Local development
 
